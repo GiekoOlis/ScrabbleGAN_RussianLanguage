@@ -18,8 +18,11 @@ datasets = {"RIMEScharH32W16": _DATA_ROOT+'RIMES/h32char16to17/tr',
 alphabet_dict = {'IAM': 'alphabetEnglish',
                  'RIMES': 'alphabetFrench',
                  'CVL': 'alphabetEnglish',
+                 'CHD': 'alphabetRussian'
                  }
 
 lex_dict = {'IAM': _DATA_ROOT + 'Lexicon/english_words.txt',
             'RIMES': _DATA_ROOT + 'Lexicon/Lexique383.tsv',
-            'CVL': _DATA_ROOT + 'Lexicon/english_words.txt'}
+            'CVL': _DATA_ROOT + 'Lexicon/english_words.txt',
+            'CHD': _DATA_ROOT + 'Lexicon/russian_words.txt'
+            }
