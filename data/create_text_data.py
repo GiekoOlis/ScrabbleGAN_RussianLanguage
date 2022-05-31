@@ -11,6 +11,7 @@ import sys
 from PIL import Image
 import random
 import io
+import pandas
 import xmltodict
 import html
 from sklearn.decomposition import PCA
@@ -83,10 +84,28 @@ def show_demo(demo_number, image_path_list, label_list):
 
 def create_img_label_list(top_dir,dataset, mode, words, author_number, remove_punc):
     root_dir = os.path.join(top_dir, dataset)
+    print('root: ', root_dir)
     output_dir = root_dir + (dataset=='IAM')*('/words'*words + '/lines'*(not words))
     image_path_list, label_list = [], []
     author_id = 'None'
-    if dataset=='CVL':
+    print('output: ', output_dir)
+    if dataset=='CHD':
+      if mode == 'tr' or mode == 'val':
+        mode_dir = ['train']
+      elif mode == 'te':
+        mode_dir = ['test']
+      elif mode == 'all':
+        mode_dir = ['test', 'train']
+      for mod in mode_dir:
+        root_dir =  os.path.join(root_dir, mod)
+        images_dir = os.path.join(root_dir, mod)
+        data = pandas.read_csv(os.path.join(*[top_dir, dataset, mod + '.tsv']), sep='\t')
+        # print(type(data))
+        for index, row in data.iterrows():
+          image_path_list.append(os.path.join(root_dir, row[0]))
+          label_list.append(row[1])
+
+    elif dataset=='CVL':
         root_dir = os.path.join(root_dir, 'cvl-database-1-1')
         if words:
             images_name = 'words'
@@ -303,8 +322,8 @@ def printAlphabet(label_list):
 
 if __name__ == '__main__':
     create_Dict = True # create a dictionary of the generated dataset
-    dataset = 'IAM'     #CVL/IAM/RIMES/gw
-    mode = 'tr'        # tr/te/val/va1/va2/all
+    dataset = 'CHD'     #CVL/IAM/RIMES/gw
+    mode = 'te'        # tr/te/val/va1/va2/all
     labeled = True
     top_dir = 'Datasets'
     # parameter relevant for IAM/RIMES:
