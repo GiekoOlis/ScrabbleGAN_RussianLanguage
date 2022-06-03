@@ -56,6 +56,7 @@ class ScrabbleGANBaseModel(BaseModel):
         self.Gradloss = torch.nn.L1Loss()
 
         self.netconverter = strLabelConverter(opt.alphabet)
+        print('alphabett: ', opt.alphabet, self.netconverter)
         self.netOCR = CRNN(opt).to(self.device)
         if len(opt.gpu_ids) > 0:
             assert (torch.cuda.is_available())
@@ -366,6 +367,7 @@ class ScrabbleGANBaseModel(BaseModel):
             # self.loss_OCR_fake = a.detach() * self.loss_OCR_fake + b.detach() * torch.sum(self.fake)
             self.loss_OCR_fake = a.detach() * self.loss_OCR_fake
             self.loss_T = (1-1*self.opt.onlyOCR)*self.loss_G + self.loss_OCR_fake
+            self.netG.zero_grad()
             self.loss_T.backward(retain_graph=True)
             grad_fake_OCR = torch.autograd.grad(self.loss_OCR_fake, self.fake, create_graph=False, retain_graph=True)[0]
             grad_fake_adv = torch.autograd.grad(self.loss_G, self.fake, create_graph=False, retain_graph=True)[0]

@@ -227,6 +227,7 @@ class strLabelConverter(object):
         self.dict = {}
         for i, char in enumerate(alphabet):
             # NOTE: 0 is reserved for 'blank' required by wrap_ctc
+            char = char.encode().decode("utf-8")
             self.dict[char] = i + 1
 
     def encode(self, text):
