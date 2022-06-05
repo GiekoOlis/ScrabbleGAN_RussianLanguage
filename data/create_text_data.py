@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import os
+import json
 import lmdb
 import cv2
 import numpy as np
@@ -116,64 +117,19 @@ def create_img_label_list(top_dir,dataset, mode, words, author_number, remove_pu
                     idx += 1
 
     elif dataset=='IAM':
-        labels_name = 'original'
-        if mode=='all':
-            mode = ['te', 'va1', 'va2', 'tr']
-        elif mode=='valtest':
-            mode=['te', 'va1', 'va2']
-        else:
-            mode = [mode]
-        if words:
-            images_name = 'wordImages'
-        else:
-            images_name = 'lineImages'
-        images_dir = os.path.join(root_dir, images_name)
-        labels_dir = os.path.join(root_dir, labels_name)
-        full_ann_files = []
-        im_dirs = []
-        line_ann_dirs = []
+        path_to_words = '/content/iam-dataset/IAM/words'
+
+        f = open('/content/iam-dataset/IAM/train-labels.json')
+        data = json.load(f)
+        f.close()
+
         image_path_list, label_list = [], []
-        for mod in mode:
-            part_file = os.path.join(root_dir, 'original_partition', mod + '.lst')
-            with open(part_file)as fp:
-                for line in fp:
-                    name = line.split('-')
-                    if int(name[-1][:-1]) == 0:
-                        anno_file = os.path.join(labels_dir, '-'.join(name[:2]) + '.xml')
-                        full_ann_files.append(anno_file)
-                        im_dir = os.path.join(images_dir, name[0], '-'.join(name[:2]))
-                        im_dirs.append(im_dir)
+        for key, value in data.items():
+          image_path_list.append(os.path.join(path_to_words, key))
+          label_list.append(value)
 
-        if author_number >= 0:
-            full_ann_files = [full_ann_files[author_number]]
-            im_dirs = [im_dirs[author_number]]
-            author_id = im_dirs[0].split('/')[-1]
-
-        lables_to_skip = ['.', '', ',', '"', "'", '(', ')', ':', ';', '!']
-        for i, anno_file in enumerate(full_ann_files):
-            with open(anno_file) as f:
-                try:
-                    line = f.read()
-                    annotation_content = xmltodict.parse(line)
-                    lines = annotation_content['form']['handwritten-part']['line']
-                    if words:
-                        lines_list = []
-                        for j in range(len(lines)):
-                            lines_list.extend(lines[j]['word'])
-                        lines = lines_list
-                except:
-                    print('line is not decodable')
-                for line in lines:
-                    try:
-                        label = html.unescape(line['@text'])
-                    except:
-                        continue
-                    if remove_punc and label in lables_to_skip:
-                        continue
-                    id = line['@id']
-                    imagePath = os.path.join(im_dirs[i], id + '.png')
-                    image_path_list.append(imagePath)
-                    label_list.append(label)
+        print(len(image_path_list), len(label_list))
+        print(image_path_list[0], label_list[0])
 
     elif dataset=='RIMES':
         if mode=='tr':
