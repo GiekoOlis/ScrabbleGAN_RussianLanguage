@@ -100,7 +100,7 @@ class ScrabbleGANBaseModel(BaseModel):
                     word=word.decode("utf-8")
                 except:
                     continue
-                if len(word)<20:
+                if len(word)<20 and len(word)>1:
                     lex.append(word)
             self.lex = lex
         else:
@@ -114,11 +114,15 @@ class ScrabbleGANBaseModel(BaseModel):
         self.fixed_fake_labels.sample_()
         self.rep_dict = {"'":"", '"':'', ' ':'_', ';':'', '.':''}
         fixed_words_fake = [self.lex[int(i)].encode('utf-8') for i in self.fixed_fake_labels]
+        # print('FIXED WORDS FAKE: ', fixed_words_fake)
+
         self.fixed_text_encode_fake, self.fixed_text_len = self.netconverter.encode(fixed_words_fake)
         if self.opt.one_hot:
             self.one_hot_fixed = make_one_hot(self.fixed_text_encode_fake, self.fixed_text_len, self.opt.n_classes)
         # Todo change to display names of classes instead of numbers
         self.label_fix = [multiple_replace(word.decode("utf-8"), self.rep_dict) for word in fixed_words_fake]
+        
+        # print('self.label_fix: ', self.label_fix)
         visual_names_fixed_noise = ['fake_fixed_' + 'label_' + label for label in self.label_fix]
         visual_names_grad_OCR = ['grad_OCR_fixed_' + 'label_' + label for label in self.label_fix]
         visual_names_grad_G = ['grad_G_fixed_' + 'label_' + label for label in self.label_fix]
@@ -138,6 +142,8 @@ class ScrabbleGANBaseModel(BaseModel):
         self.l1_loss = L1Loss()
         self.mse_loss = MSELoss()
         self.OCRconverter = OCRLabelConverter(opt.alphabet)
+        
+        # print('just alphabet: ', opt.alphabet)
         self.epsilon = 1e-7
         self.real_z = None
         self.real_z_mean = None

@@ -102,8 +102,9 @@ def create_img_label_list(top_dir,dataset, mode, words, author_number, remove_pu
         data = pandas.read_csv(os.path.join(*[top_dir, dataset, mod + '.tsv']), sep='\t')
         # print(type(data))
         for index, row in data.iterrows():
-          image_path_list.append(os.path.join(root_dir, row[0]))
-          label_list.append(row[1])
+          if len(row[1])<20 and len(row[1])>1 and (" " not in row[1]):
+            image_path_list.append(os.path.join(root_dir, row[0]))
+            label_list.append(row[1])
 
     elif dataset=='CVL':
         root_dir = os.path.join(root_dir, 'cvl-database-1-1')

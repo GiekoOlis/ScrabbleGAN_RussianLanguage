@@ -133,6 +133,7 @@ class OCRLabelConverter(object):
         for i, char in enumerate(alphabet):
             # NOTE: 0 is reserved for 'blank' required by wrap_ctc
             self.dict[char] = i + 1
+        print('ALPHABET: ', self.dict)
 
     def encode(self, text):
         """Support batch or single str.
